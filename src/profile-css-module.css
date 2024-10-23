@@ -1,0 +1,38 @@
+/* Profile.module.css */
+.profile {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.profile h1 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.profile form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.profile button {
+  margin-top: 10px;
+}
+
+.profile p {
+  margin-bottom: 10px;
+}
+
+.profile .buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
