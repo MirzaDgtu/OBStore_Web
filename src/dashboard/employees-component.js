@@ -29,6 +29,7 @@ import {
   Key as KeyIcon,
   Block as BlockIcon,
   FiberManualRecord as OnlineIcon,
+  PhotoCamera,
 } from '@mui/icons-material';
 import api from '../api/api.js';
 
@@ -46,7 +47,9 @@ const Employees = () => {
     firstname: '',
     lastname: '',
     phone: '',
+    inn: '',
     blocked: false,
+    avatar: null
   });
 
   const [passwords, setPasswords] = useState({
@@ -79,7 +82,9 @@ const Employees = () => {
         firstname: employee.firstname,
         lastname: employee.lastname,
         phone: employee.phone,
+        inn: employee.inn || '',
         blocked: employee.blocked,
+        avatar: employee.avatar
       });
     } else {
       setFormData({
@@ -87,7 +92,9 @@ const Employees = () => {
         firstname: '',
         lastname: '',
         phone: '',
+        inn: '',
         blocked: false,
+        avatar: null
       });
     }
     setOpenDialog(true);
@@ -101,7 +108,9 @@ const Employees = () => {
       firstname: '',
       lastname: '',
       phone: '',
+      inn: '',
       blocked: false,
+      avatar: null
     });
   };
 
@@ -110,6 +119,7 @@ const Employees = () => {
     if (!formData.email) errors.email = 'Email обязателен';
     if (!formData.firstname) errors.firstname = 'Имя обязательно';
     if (!formData.phone) errors.phone = 'Телефон обязателен';
+    if (!formData.inn) errors.inn = 'ИНН обязателен';
     return Object.keys(errors).length === 0;
   };
 
@@ -172,14 +182,62 @@ const Employees = () => {
     }
 
     try {
-      await api.post(`/users/${selectedEmployee.ID}/password`, {
-        newPassword: passwords.newPassword,
+      await api.post('/user/update/pass', {
+        id: selectedEmployee.ID,
+        password: passwords.newPassword
       });
       setMessage('Пароль успешно изменен');
       setOpenPasswordDialog(false);
       setPasswords({ newPassword: '', confirmPassword: '' });
     } catch (error) {
       setMessage('Ошибка при изменении пароля');
+    }
+  };
+
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage('Размер файла не должен превышать 5 МБ');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setMessage('Пожалуйста, загрузите изображение');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await api.post(`/users/${selectedEmployee.ID}/avatar/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setFormData(prev => ({
+        ...prev,
+        avatar: response.data.avatarUrl,
+      }));
+      setMessage('Аватар успешно обновлен');
+    } catch (error) {
+      setMessage('Ошибка при загрузке аватара');
+    }
+  };
+
+  const handleAvatarDelete = async () => {
+    try {
+      await api.post(`/users/${selectedEmployee.ID}/avatar/delete`);
+      setFormData(prev => ({
+        ...prev,
+        avatar: null,
+      }));
+      setMessage('Аватар успешно удален');
+    } catch (error) {
+      setMessage('Ошибка при удалении аватара');
     }
   };
 
@@ -208,6 +266,7 @@ const Employees = () => {
                 <TableCell>Email</TableCell>
                 <TableCell>Имя</TableCell>
                 <TableCell>Фамилия</TableCell>
+                <TableCell>ИНН</TableCell>
                 <TableCell>Телефон</TableCell>
                 <TableCell>Статус</TableCell>
                 <TableCell>Блокировка</TableCell>
@@ -233,6 +292,7 @@ const Employees = () => {
                   <TableCell>{employee.email}</TableCell>
                   <TableCell>{employee.firstname}</TableCell>
                   <TableCell>{employee.lastname}</TableCell>
+                  <TableCell>{employee.inn}</TableCell>
                   <TableCell>{employee.phone}</TableCell>
                   <TableCell>
                     <Badge
@@ -288,7 +348,54 @@ const Employees = () => {
           {dialogMode === 'add' ? 'Добавить сотрудника' : 'Редактировать данные сотрудника'}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            {dialogMode === 'edit' && (
+              <Box sx={{ position: 'relative', mb: 2 }}>
+                <Avatar
+                  src={formData.avatar}
+                  sx={{
+                    width: 100,
+                    height: 100,
+                    mb: 2,
+                    bgcolor: 'primary.main',
+                    fontSize: '2.5rem',
+                  }}
+                >
+                  {formData.firstname ? formData.firstname[0].toUpperCase() : '?'}
+                </Avatar>
+                <Box sx={{ 
+                  position: 'absolute', 
+                  bottom: 16, 
+                  right: -16, 
+                  display: 'flex', 
+                  gap: 1 
+                }}>
+                  <IconButton
+                    color="primary"
+                    aria-label="upload picture"
+                    component="label"
+                    sx={{ bgcolor: 'white', '&:hover': { bgcolor: 'grey.100' } }}
+                  >
+                    <input
+                      hidden
+                      accept="image/*"
+                      type="file"
+                      onChange={handleAvatarUpload}
+                    />
+                    <PhotoCamera />
+                  </IconButton>
+                  {formData.avatar && (
+                    <IconButton
+                      onClick={handleAvatarDelete}
+                      sx={{ bgcolor: 'white', '&:hover': { bgcolor: 'grey.100' } }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
+                </Box>
+              </Box>
+            )}
+
             <TextField
               fullWidth
               label="Email"
@@ -314,6 +421,14 @@ const Employees = () => {
             />
             <TextField
               fullWidth
+              label="ИНН"
+              name="inn"
+              value={formData.inn}
+              onChange={(e) => setFormData({ ...formData, inn: e.target.value })}
+              required
+            />
+            <TextField
+              fullWidth
               label="Телефон"
               name="phone"
               value={formData.phone}
@@ -334,7 +449,8 @@ const Employees = () => {
       </Dialog>
 
       {/* Диалог смены пароля */}
-      <Dialog open={openPasswordDialog} onClose={() => setOpenPasswordDialog(false)}>
+{/* Диалог смены пароля */}
+<Dialog open={openPasswordDialog} onClose={() => setOpenPasswordDialog(false)}>
         <DialogTitle>Изменение пароля</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2 }}>
@@ -344,7 +460,7 @@ const Employees = () => {
               label="Новый пароль"
               type="password"
               value={passwords.newPassword}
-              onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+              onChange={(e) => setPasswords(prev => ({ ...prev, newPassword: e.target.value }))}
             />
             <TextField
               fullWidth
@@ -352,7 +468,7 @@ const Employees = () => {
               label="Подтверждение пароля"
               type="password"
               value={passwords.confirmPassword}
-              onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+              onChange={(e) => setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }))}
             />
           </Box>
         </DialogContent>
@@ -377,3 +493,4 @@ const Employees = () => {
 };
 
 export default Employees;
+              

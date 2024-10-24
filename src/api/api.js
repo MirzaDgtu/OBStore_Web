@@ -45,7 +45,7 @@ export const login = async (email, password) => {
 
 export const register = async (name, lastname, inn, email, password) => {
   try {
-    const response = await api.post('/users/', { name, lastname, inn, email, password });
+    const response = await api.post('/users', { name, lastname, inn, email, password });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Ошибка регистрации');
@@ -79,6 +79,26 @@ export const getOrders = async () => {
   }
 };
 
+
+export const updateOrder = async (id, data) => {
+  try {
+    const response = await api.put(`/orders/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка обновления заказа');
+  }
+};
+
+export const deleteOrder = async (id) => {
+  try {
+    const response = await api.delete(`/orders/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка удаления заказа');
+  }
+};
+
+
 export const getCompletedOrders = async () => {
   try {
     const response = await api.get('/completed-orders');
@@ -105,5 +125,56 @@ export const getEmployees = async () => {
     throw new Error(error.response?.data?.message || 'Ошибка загрузки данных сотрудников');
   }
 };
+
+// Новые методы для работы с пользователями
+export const updateUserPassword = async (id, password) => {
+  try {
+    const response = await api.post('/user/update/pass', { id, password });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка изменения пароля');
+  }
+};
+
+export const blockUser = async (id, blocked) => {
+  try {
+    const response = await api.post(`/users/${id}/block`, { blocked });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка изменения статуса блокировки');
+  }
+};
+
+export const deleteUser = async (id) => {
+  try {
+    const response = await api.post(`/users/${id}/delete`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка удаления пользователя');
+  }
+};
+
+export const uploadUserAvatar = async (id, avatarData) => {
+  try {
+    const response = await api.post(`/users/${id}/avatar/upload`, avatarData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка загрузки аватара');
+  }
+};
+
+export const deleteUserAvatar = async (id) => {
+  try {
+    const response = await api.post(`/users/${id}/avatar/delete`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка удаления аватара');
+  }
+};
+
 
 export default api;
