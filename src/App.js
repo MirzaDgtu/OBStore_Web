@@ -3,15 +3,23 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import LoginForm from './components/login-form';
 import Dashboard from './components/dashboard-component';
-//import Profile from './components/Profile';
+import Profile from './dashboard/user-profile';
 //import Orders from './components/Orders';
 //import CompletedOrders from './components/CompletedOrders';
 //import Reports from './components/Reports';
-//import Employees from './components/Employees';
+import Employees from './dashboard/employees-component';
 
 const theme = createTheme({
   // Здесь вы можете настроить тему вашего приложения
 });
+
+const navItems = [
+    { label: 'Заказы', path: '/dashboard/orders' },
+    { label: 'Собранные заказы', path: '/dashboard/completed-orders' },
+    { label: 'Отчеты', path: '/dashboard/reports' },
+    { label: 'Сотрудники', path: '/dashboard/employees' },
+    { label: 'Профиль', path: '/dashboard/profile' },
+];
 
 const PrivateRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem('authToken');
@@ -24,10 +32,28 @@ const App = () => {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route path="/login" element={<LoginForm />} />          
-          <Route path="*" element={<Navigate to="/" replace />} />
-          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>}>
+          <Route path="/login" element={<LoginForm />} />
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Dashboard navItems={navItems} />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Navigate to="/dashboard" />} />
+            <Route path="dashboard/*" element={<Dashboard navItems={navItems} />}>
+              <Route path="profile" element={<Profile />} />
+              {/* Здесь будут остальные маршруты */}
+              {/*
+              <Route path="orders" element={<Orders />} />
+              <Route path="completed-orders" element={<CompletedOrders />} />
+              <Route path="reports" element={<Reports />} />*/
+              <Route path="employees" element={<Employees />} />
+              }
+            </Route>
           </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </ThemeProvider>

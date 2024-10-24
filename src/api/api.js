@@ -99,7 +99,7 @@ export const getReports = async () => {
 
 export const getEmployees = async () => {
   try {
-    const response = await api.get('/employees');
+    const response = await api.get('/users');
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Ошибка загрузки данных сотрудников');

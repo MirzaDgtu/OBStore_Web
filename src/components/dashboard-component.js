@@ -1,15 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Outlet } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Box, Container, Snackbar, Grid, Paper, IconButton } from '@mui/material';
-import { ExitToApp as LogoutIcon, Brightness4 as DarkModeIcon, Brightness7 as LightModeIcon } from '@mui/icons-material';
+import { useNavigate, Outlet, Routes, Route } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box, Container, Snackbar, Paper, IconButton, Grid2 } from '@mui/material';
+import { ExitToApp as LogoutIcon, Brightness4 as DarkModeIcon, Brightness7 as LightModeIcon, Settings as SettingsIcon } from '@mui/icons-material';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { GlobalStyles } from '@mui/system';
-import api from './api/api.js';
+import api from '../api/api.js';
+import Profile from '../dashboard/user-profile';
+import Employees from '../dashboard/employees-component';
+
+const StatsDisplay = ({ warehouseStats, pickerStats }) => (
+  <Grid2 container spacing={3}>
+    <Grid2 item xs={12} md={6}>
+      <Paper sx={{ p: 2 }}>
+        <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+          Информация о складе
+        </Typography>
+        <Box sx={{ '& > *': { mb: 1 } }}>
+          <Typography>Сборщиков онлайн: {warehouseStats.pickersOnline}</Typography>
+          <Typography>Общее количество заказов: {warehouseStats.totalOrders}</Typography>
+          <Typography>Собранные заказы: {warehouseStats.completedOrders}</Typography>
+          <Typography>Несобранные заказы: {warehouseStats.pendingOrders}</Typography>
+        </Box>
+      </Paper>
+    </Grid2>
+
+    <Grid2 item xs={12} md={6}>
+      <Paper sx={{ p: 2 }}>
+        <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+          Статистика сборщиков
+        </Typography>
+        {pickerStats.length > 0 ? (
+          pickerStats.map((picker) => (
+            <Typography key={picker.id}>
+              {picker.name}: Собрано заказов - {picker.completedOrders}
+            </Typography>
+          ))
+        ) : (
+          <Typography>Нет данных о сборщиках</Typography>
+        )}
+      </Paper>
+    </Grid2>
+  </Grid2>
+);
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
-  
   const [themeMode, setThemeMode] = useState('light');
   const [warehouseStats, setWarehouseStats] = useState({
     pickersOnline: 0,
@@ -18,6 +54,13 @@ const Dashboard = () => {
     pendingOrders: 0,
   });
   const [pickerStats, setPickerStats] = useState([]);
+
+  const navItems = [
+    { label: 'ЗАКАЗЫ', path: '/dashboard/orders' },
+    { label: 'СОБРАННЫЕ ЗАКАЗЫ', path: '/dashboard/completed-orders' },
+    { label: 'ОТЧЕТЫ', path: '/dashboard/reports' },
+    { label: 'СОТРУДНИКИ', path: '/dashboard/employees' },
+  ];
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('themeMode') || 'light';
@@ -30,6 +73,16 @@ const Dashboard = () => {
 
   const handleThemeToggle = () => {
     setThemeMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/user/signout');
+      localStorage.removeItem('authToken');
+      navigate('/login');
+    } catch (err) {
+      setError('Ошибка при выходе из системы');
+    }
   };
 
   useEffect(() => {
@@ -55,39 +108,49 @@ const Dashboard = () => {
     fetchPickerStats();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/user/signout');
-      localStorage.removeItem('authToken');
-      navigate('/login');
-    } catch (err) {
-      setError('Ошибка при выходе из системы');
-    }
-  };
-
-  const navItems = [
-    { label: 'Заказы', path: '/orders' },
-    { label: 'Собранные заказы', path: '/completed-orders' },
-    { label: 'Отчеты', path: '/reports' },
-    { label: 'Сотрудники', path: '/employees' },
-    { label: 'Профиль', path: '/profile' },
-  ];
-
   const theme = createTheme({
     palette: {
       mode: themeMode,
+      primary: {
+        main: '#1976d2',
+      },
       background: {
-        default: themeMode === 'light' ? '#f4f6f8' : '#121212', // цвет фона для светлой и тёмной темы
-        paper: themeMode === 'light' ? '#fff' : '#424242', // цвет для элементов типа Paper
+        default: themeMode === 'light' ? '#f4f6f8' : '#121212',
+        paper: themeMode === 'light' ? '#fff' : '#424242',
+      },
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            fontWeight: 'bold',
+            minWidth: 'auto',
+            padding: '6px 16px',
+          },
+        },
+      },
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#1976d2',
+          },
+        },
+      },
+      MuiToolbar: {
+        styleOverrides: {
+          root: {
+            '@media (min-width: 600px)': {
+              padding: '0 24px',
+            },
+          },
+        },
       },
     },
   });
 
   return (
     <ThemeProvider theme={theme}>
-      {/* CssBaseline применяет основные стили Material-UI */}
       <CssBaseline />
-      {/* GlobalStyles позволяет настроить стили для всего body */}
       <GlobalStyles
         styles={{
           body: {
@@ -101,54 +164,47 @@ const Dashboard = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <AppBar position="static">
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Панель управления
-            </Typography>
             {navItems.map((item) => (
-              <Button key={item.path} color="inherit" onClick={() => navigate(item.path)}>
+              <Button 
+                key={item.path} 
+                color="inherit"
+                onClick={() => navigate(item.path)}
+                sx={{ marginRight: 2 }}
+              >
                 {item.label}
               </Button>
             ))}
+            <Box sx={{ flexGrow: 1 }} />
             <IconButton color="inherit" onClick={handleThemeToggle}>
               {themeMode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
             </IconButton>
-            <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
-              Выйти
+            <IconButton 
+              color="inherit" 
+              onClick={() => navigate('/dashboard/profile')}
+              sx={{ marginLeft: 1 }}
+            >
+              <SettingsIcon />
+            </IconButton>
+            <Button 
+              color="inherit" 
+              onClick={handleLogout} 
+              startIcon={<LogoutIcon />}
+              sx={{ marginLeft: 2 }}
+            >
+              ВЫЙТИ
             </Button>
           </Toolbar>
         </AppBar>
         <Container component="main" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  Информация о складе
-                </Typography>
-                <Typography>Сборщиков онлайн: {warehouseStats.pickersOnline}</Typography>
-                <Typography>Общее количество заказов: {warehouseStats.totalOrders}</Typography>
-                <Typography>Собранные заказы: {warehouseStats.completedOrders}</Typography>
-                <Typography>Несобранные заказы: {warehouseStats.pendingOrders}</Typography>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  Статистика сборщиков
-                </Typography>
-                {pickerStats.length > 0 ? (
-                  pickerStats.map((picker) => (
-                    <Typography key={picker.id}>
-                      {picker.name}: Собрано заказов - {picker.completedOrders}
-                    </Typography>
-                  ))
-                ) : (
-                  <Typography>Нет данных о сборщиках</Typography>
-                )}
-              </Paper>
-            </Grid>
-          </Grid>
-          <Outlet />
+          <Routes>
+            <Route path="/" element={<StatsDisplay warehouseStats={warehouseStats} pickerStats={pickerStats} />} />
+            <Route path="/dashboard" element={<StatsDisplay warehouseStats={warehouseStats} pickerStats={pickerStats} />} />
+            <Route path="/dashboard/profile" element={<Profile />} />
+            <Route path="/dashboard/orders" element={<div>Страница заказов</div>} />
+            <Route path="/dashboard/completed-orders" element={<div>Страница собранных заказов</div>} />
+            <Route path="/dashboard/reports" element={<div>Страница отчетов</div>} />
+            <Route path="/dashboard/employees" element={<Employees/>} />
+          </Routes>
         </Container>
         <Snackbar
           open={!!error}

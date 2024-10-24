@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Grid, Typography, TextField, Button, IconButton, Snackbar } from '@mui/material';
 import { Facebook, Twitter, Google, LinkedIn } from '@mui/icons-material';
 import { styled } from '@mui/system';
-import { login, register } from './api/api.js';
+import { login, register } from '../api/api.js';
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: '#fff',
