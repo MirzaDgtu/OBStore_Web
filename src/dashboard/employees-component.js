@@ -160,7 +160,7 @@ const Employees = () => {
 
   const handleBlockToggle = async (employee) => {
     try {
-      await api.post(`/users/${employee.ID}/block`, {
+      await api.post(`/users/${employee.ID}/block/`, {
         blocked: !employee.blocked
       });
       setMessage(employee.blocked ? 'Сотрудник разблокирован' : 'Сотрудник заблокирован');

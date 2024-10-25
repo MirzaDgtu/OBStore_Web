@@ -45,9 +45,9 @@ const App = () => {
             <Route path="dashboard/*" element={<Dashboard navItems={navItems} />}>
               <Route path="profile" element={<Profile />} />
               {/* Здесь будут остальные маршруты */}
-              {
+              
               <Route path="orders" element={<Orders />} />
-              /*<Route path="completed-orders" element={<CompletedOrders />} />
+              {/*<Route path="completed-orders" element={<CompletedOrders />} />
               <Route path="reports" element={<Reports />} />*/
               <Route path="employees" element={<Employees />} />
               }

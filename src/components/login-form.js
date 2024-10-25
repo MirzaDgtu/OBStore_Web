@@ -28,7 +28,7 @@ const SocialIcons = () => (
 const LoginForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
-  const [name, setName] = useState('');
+  const [firstname, setFirstName] = useState('');
   const [lastname, setLastName] = useState('');
   const [inn, setInn] = useState('')  
   const [email, setEmail] = useState('');
@@ -42,7 +42,7 @@ const LoginForm = () => {
     setError('');
     try {
       if (isSignUp) {
-        await register(name, lastname, inn, email, password);
+        await register(firstname, lastname, inn, email, password);
         setSnackbarMessage('Регистрация прошла успешно. Пожалуйста, войдите в систему.');
         setSnackbarOpen(true);
         setIsSignUp(false);
@@ -71,7 +71,7 @@ const LoginForm = () => {
   const resetForm = () => {
     setIsSignUp(!isSignUp);
     setError('');
-    setName('');
+    setFirstName('');
     setLastName('');
     setInn('');
     setEmail('');
@@ -95,13 +95,13 @@ const LoginForm = () => {
                 margin="normal"
                 required
                 fullWidth
-                id="name"
+                id="firstname"
                 label="Имя"
-                name="name"
-                autoComplete="name"
+                name="firstname"
+                autoComplete="firstname"
                 autoFocus
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={firstname}
+                onChange={(e) => setFirstName(e.target.value)}
               />      
                     
             )}
@@ -190,7 +190,7 @@ const LoginForm = () => {
             onClick={() => {
               setIsSignUp(!isSignUp);
               setError('');
-              setName('');
+              setFirstName('');
               setLastName('');
               setInn('');
               setEmail('');

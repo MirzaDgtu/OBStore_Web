@@ -43,9 +43,9 @@ export const login = async (email, password) => {
   }
 };
 
-export const register = async (name, lastname, inn, email, password) => {
+export const register = async (firstname, lastname, inn, email, password) => {  
   try {
-    const response = await api.post('/users', { name, lastname, inn, email, password });
+    const response = await api.post('/users', { firstname, lastname, inn, email,  pass: password });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Ошибка регистрации');
