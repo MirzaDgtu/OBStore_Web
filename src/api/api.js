@@ -12,7 +12,7 @@ const api = axios.create({
 // Интерцептор для добавления токена аутентификации
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('Auth');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -27,7 +27,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('Auth');
-      window.location.href = '/users/signin';
+      localStorage.removeItem('User');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
@@ -36,7 +37,6 @@ api.interceptors.response.use(
 export const login = async (email, password) => {
   try {
     const response = await api.post('/users/signin', { email, password });
-    console.log(response.data)
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Ошибка входа');
@@ -61,6 +61,7 @@ export const getUserProfile = async () => {
   }
 };
 
+
 export const updateUserProfile = async (userData) => {
   try {
     const response = await api.put('/user', userData);
@@ -70,9 +71,13 @@ export const updateUserProfile = async (userData) => {
   }
 };
 
-export const getOrders = async () => {
+export const getOrders = async (startDate, endDate) => {
   try {
-    const response = await api.get('/orders');
+    let url = '/orders';
+    if (startDate && endDate) {
+      url = `/orders?startDate=${startDate}&endDate=${endDate}`;
+    }
+    const response = await api.get(url);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Ошибка загрузки заказов');

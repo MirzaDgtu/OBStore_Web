@@ -253,7 +253,7 @@ const Employees = () => {
             startIcon={<AddIcon />}
             onClick={() => handleOpenDialog('add')}
           >
-            Добавить сотрудника
+            Добавить
           </Button>
         </Box>
 

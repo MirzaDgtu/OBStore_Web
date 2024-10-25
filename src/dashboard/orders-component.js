@@ -15,13 +15,28 @@ import {
   TablePagination,
   TextField,
   InputAdornment,
+<<<<<<< HEAD
+=======
+  Button,
+>>>>>>> 80016cd63a26df4c97d84068b02e2f0d080b3620
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
+<<<<<<< HEAD
 } from '@mui/icons-material';
 import api from '../api/api';
+=======
+  FilterAlt as FilterIcon,
+} from '@mui/icons-material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { format } from 'date-fns';
+import ruLocale from 'date-fns/locale/ru';
+import { getOrders } from '../api/api';
+>>>>>>> 80016cd63a26df4c97d84068b02e2f0d080b3620
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -31,9 +46,17 @@ const Orders = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredOrders, setFilteredOrders] = useState([]);
+<<<<<<< HEAD
 
   useEffect(() => {
     fetchOrders();
+=======
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  useEffect(() => {
+    getOrdersData();
+>>>>>>> 80016cd63a26df4c97d84068b02e2f0d080b3620
   }, []);
 
   useEffect(() => {
@@ -46,12 +69,29 @@ const Orders = () => {
     setPage(0);
   }, [searchTerm, orders]);
 
+<<<<<<< HEAD
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const response = await api.get('/orders');
       setOrders(response.data);
       setFilteredOrders(response.data);
+=======
+  const getOrdersData = async () => {
+    try {
+      setLoading(true);
+      if (startDate && endDate) {
+        const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+        const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+        const data = await getOrders(formattedStartDate, formattedEndDate);
+        setOrders(data);
+        setFilteredOrders(data);
+      } else {
+        const data = await getOrders();
+        setOrders(data);
+        setFilteredOrders(data);
+      }
+>>>>>>> 80016cd63a26df4c97d84068b02e2f0d080b3620
     } catch (error) {
       setMessage('Ошибка при загрузке заказов');
     } finally {
@@ -59,6 +99,17 @@ const Orders = () => {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleDateRangeSubmit = () => {
+    if (startDate && endDate) {
+      getOrdersData();
+    } else {
+      setMessage('Пожалуйста, выберите обе даты');
+    }
+  };
+
+>>>>>>> 80016cd63a26df4c97d84068b02e2f0d080b3620
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
       day: '2-digit',
@@ -86,6 +137,7 @@ const Orders = () => {
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Paper sx={{ p: 2 }}>
+<<<<<<< HEAD
         <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h5" component="h2" sx={{ color: 'primary.main' }}>
             Заказы
@@ -105,6 +157,71 @@ const Orders = () => {
             }}
             sx={{ width: 300 }}
           />
+=======
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h5" component="h2" sx={{ color: 'primary.main', mb: 2 }}>
+            Заказы
+          </Typography>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            mb: 2
+          }}>
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+              <DatePicker
+                label="Дата начала"
+                value={startDate}
+                onChange={(newValue) => setStartDate(newValue)}
+                slotProps={{ 
+                  textField: { 
+                    size: 'small',
+                    sx: { width: 200 }
+                  } 
+                }}
+                format="dd.MM.yyyy"
+              />
+              <DatePicker
+                label="Дата окончания"
+                value={endDate}
+                onChange={(newValue) => setEndDate(newValue)}
+                slotProps={{ 
+                  textField: { 
+                    size: 'small',
+                    sx: { width: 200 }
+                  } 
+                }}
+                format="dd.MM.yyyy"
+              />
+            </LocalizationProvider>
+            <Button
+              variant="contained"
+              startIcon={<FilterIcon />}
+              onClick={handleDateRangeSubmit}
+              disabled={!startDate || !endDate}
+            >
+              Применить фильтр
+            </Button>
+
+            <TextField
+              size="small"
+              variant="outlined"
+              placeholder="Поиск..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ width: 300, ml: 'auto' }}
+            />
+          </Box>
+>>>>>>> 80016cd63a26df4c97d84068b02e2f0d080b3620
         </Box>
 
         <TableContainer>
@@ -189,4 +306,8 @@ const Orders = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Orders;
+=======
+export default Orders;
+>>>>>>> 80016cd63a26df4c97d84068b02e2f0d080b3620
