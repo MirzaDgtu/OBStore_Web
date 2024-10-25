@@ -4,7 +4,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import LoginForm from './components/login-form';
 import Dashboard from './components/dashboard-component';
 import Profile from './dashboard/user-profile';
-//import Orders from './components/Orders';
+import Orders from './dashboard/orders-component';
 //import CompletedOrders from './components/CompletedOrders';
 //import Reports from './components/Reports';
 import Employees from './dashboard/employees-component';
@@ -44,13 +44,10 @@ const App = () => {
             <Route index element={<Navigate to="/dashboard" />} />
             <Route path="dashboard/*" element={<Dashboard navItems={navItems} />}>
               <Route path="profile" element={<Profile />} />
-              {/* Здесь будут остальные маршруты */}
-              {/*
               <Route path="orders" element={<Orders />} />
-              <Route path="completed-orders" element={<CompletedOrders />} />
-              <Route path="reports" element={<Reports />} />*/
+              {/*<Route path="completed-orders" element={<CompletedOrders />} />*/}
+              {/*<Route path="reports" element={<Reports />} />*/}
               <Route path="employees" element={<Employees />} />
-              }
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

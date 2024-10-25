@@ -47,9 +47,14 @@ const LoginForm = () => {
         setSnackbarOpen(true);
         setIsSignUp(false);
       } else {
-        const data = await login(email, password);
-        localStorage.setItem('authToken', data.token);
-        navigate('/dashboard');
+        const userData = await login(email, password);
+        if (userData.token) {
+          localStorage.setItem('Auth', userData.token);
+          localStorage.setItem('User', JSON.stringify(userData));
+          navigate('/dashboard');
+        } else {
+          setError('Ошибка авторизации: токен не получен');
+        }
       }
     } catch (err) {
       setError(err.message);
@@ -61,6 +66,16 @@ const LoginForm = () => {
       return;
     }
     setSnackbarOpen(false);
+  };
+
+  const resetForm = () => {
+    setIsSignUp(!isSignUp);
+    setError('');
+    setName('');
+    setLastName('');
+    setInn('');
+    setEmail('');
+    setPassword('');
   };
 
   return (

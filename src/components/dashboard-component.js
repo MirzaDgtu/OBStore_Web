@@ -7,6 +7,7 @@ import { GlobalStyles } from '@mui/system';
 import api from '../api/api.js';
 import Profile from '../dashboard/user-profile';
 import Employees from '../dashboard/employees-component';
+import Orders from '../dashboard/orders-component';
 
 const StatsDisplay = ({ warehouseStats, pickerStats }) => (
   <Grid2 container spacing={3}>
@@ -200,7 +201,7 @@ const Dashboard = () => {
             <Route path="/" element={<StatsDisplay warehouseStats={warehouseStats} pickerStats={pickerStats} />} />
             <Route path="/dashboard" element={<StatsDisplay warehouseStats={warehouseStats} pickerStats={pickerStats} />} />
             <Route path="/dashboard/profile" element={<Profile />} />
-            <Route path="/dashboard/orders" element={<div>Страница заказов</div>} />
+            <Route path="/dashboard/orders" element={<Orders />} />
             <Route path="/dashboard/completed-orders" element={<div>Страница собранных заказов</div>} />
             <Route path="/dashboard/reports" element={<div>Страница отчетов</div>} />
             <Route path="/dashboard/employees" element={<Employees/>} />
