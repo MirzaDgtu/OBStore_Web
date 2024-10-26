@@ -160,11 +160,9 @@ const Employees = () => {
 
   const handleBlockToggle = async (employee) => {
     try {
-      await api.post(`/users/${employee.ID}/block/`, {
-        blocked: !employee.blocked
-      });
+      await api.blockUser(employee.ID, !employee.blocked);
       setMessage(employee.blocked ? 'Сотрудник разблокирован' : 'Сотрудник заблокирован');
-      fetchEmployees();
+      fetchEmployees(); // обновляем список после изменения
     } catch (error) {
       setMessage('Ошибка при изменении статуса блокировки');
     }
