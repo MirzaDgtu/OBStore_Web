@@ -8,6 +8,7 @@ import api from '../api/api.js';
 import Profile from '../dashboard/user-profile';
 import Employees from '../dashboard/employees-component';
 import Orders from '../dashboard/orders-component';
+import Reports from '../dashboard/reports-component';
 
 const StatsDisplay = ({ warehouseStats, pickerStats }) => (
   <Grid2 container spacing={3}>
@@ -203,7 +204,7 @@ const Dashboard = () => {
             <Route path="/dashboard/profile" element={<Profile />} />
             <Route path="/dashboard/orders" element={<Orders />} />
             <Route path="/dashboard/completed-orders" element={<div>Страница собранных заказов</div>} />
-            <Route path="/dashboard/reports" element={<div>Страница отчетов</div>} />
+            <Route path="/dashboard/reports" element={<Reports />} />
             <Route path="/dashboard/employees" element={<Employees/>} />
           </Routes>
         </Container>
