@@ -7,6 +7,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Добавляем поддержку credentials
+  withCredentials: true  // Важное изменение - позволяет отправлять куки
 });
 
 // Интерцептор для добавления токена аутентификации
@@ -14,20 +16,25 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('Auth');
     if (token) {
-      config.headers['Cookie'] = `Bearer ${token}`;
+      // Можем оставить и заголовок Authorization для двойной поддержки
+     // config.headers['Authorization'] = `Bearer ${token}`;
+      // Добавляем куку
+      document.cookie = `Auth=${token}; path=/`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Интерцептор для обработки ошибок
+// Интерцептор для обработки ошибок остается тем же
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('Auth');
       localStorage.removeItem('User');
+      // Удаляем куку при разлогине
+      document.cookie = 'Auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -37,6 +44,15 @@ api.interceptors.response.use(
 export const login = async (email, password) => {
   try {
     const response = await api.post('/users/signin', { email, password });
+    const { token } = response.data;
+    
+    // Сохраняем в localStorage
+    localStorage.setItem('Auth', token);
+    localStorage.setItem('User', JSON.stringify(response.data));
+    
+    // Сохраняем в куки
+    document.cookie = `Auth=${token}; path=/`;
+    
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Ошибка входа');
@@ -134,6 +150,8 @@ export const getEmployees = async () => {
 // Новые методы для работы с пользователями
 export const updateUserPassword = async (id, password) => {
   try {
+    console.log(axios.config)
+
     const response = await api.post('/user/update/pass', { id, password });
     return response.data;
   } catch (error) {
@@ -141,12 +159,14 @@ export const updateUserPassword = async (id, password) => {
   }
 };
 
-export const blockUser = async (id, blocked) => {
+export const blockUser = async (userId, blocked) => {
   try {
-    const response = await api.post(`/users/${id}/block`, { blocked });
+    const response = await api.post(`/user/${userId}/block`, { blocked }, {
+      withCredentials: true  // Убедимся, что куки отправляются
+    });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Ошибка изменения статуса блокировки');
+    throw new Error(error.response?.data?.message || 'Ошибка при изменении статуса блокировки');
   }
 };
 

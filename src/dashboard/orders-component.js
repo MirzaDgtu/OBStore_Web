@@ -1,185 +1,201 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
-  Paper,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Box,
-  Snackbar,
-  IconButton,
-  TablePagination,
-  TextField,
-  InputAdornment,
-  Button,
+Container,
+Paper,
+Typography,
+Table,
+TableBody,
+TableCell,
+TableContainer,
+TableHead,
+TableRow,
+Box,
+Snackbar,
+IconButton,
+TablePagination,
+TextField,
+InputAdornment,
+Button,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  FilterAlt as FilterIcon,
+Search as SearchIcon,
+Edit as EditIcon,
+Delete as DeleteIcon,
+FilterAlt as FilterIcon,
+Feed as Feed,
+PlaylistAddCheck as PlaylistAddCheck,
+EditNote as EditNote,
 } from '@mui/icons-material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { format } from 'date-fns';
 import ruLocale from 'date-fns/locale/ru';
 import { getOrders } from '../api/api';
 
+const OrderStatusIcon = ({ status }) => {
+switch (status) {
+    case 0:
+     return <Feed titleAccess="Новый заказ" />;
+    case 1:
+     return <EditNote titleAccess="Начали сборку" />;
+    case 2:
+     return <PlaylistAddCheck titleAccess="Закончили сборку" />;
+    default:
+     return null;
+}
+};
+
 const Orders = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+const [orders, setOrders] = useState([]);
+const [loading, setLoading] = useState(false);
+const [message, setMessage] = useState('');
+const [page, setPage] = useState(0);
+const [rowsPerPage, setRowsPerPage] = useState(10);
+const [searchTerm, setSearchTerm] = useState('');
+const [filteredOrders, setFilteredOrders] = useState([]);
+const [startDate, setStartDate] = useState(null);
+const [endDate, setEndDate] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
     getOrdersData();
-  }, []);
+}, []);
 
-  useEffect(() => {
+useEffect(() => {
     const filtered = orders.filter(order =>
-      Object.values(order).some(value =>
+     Object.values(order).some(value =>
         value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      )
+     )
     );
     setFilteredOrders(filtered);
     setPage(0);
-  }, [searchTerm, orders]);
+}, [searchTerm, orders]);
 
-  const getOrdersData = async () => {
+const getOrdersData = async () => {
     try {
-      setLoading(true);
-      if (startDate && endDate) {
+     setLoading(true);
+     if (startDate && endDate) {
         const formattedStartDate = format(startDate, 'yyyy-MM-dd');
         const formattedEndDate = format(endDate, 'yyyy-MM-dd');
         const data = await getOrders(formattedStartDate, formattedEndDate);
         setOrders(data);
         setFilteredOrders(data);
-      } else {
+     } else {
         const data = await getOrders();
         setOrders(data);
         setFilteredOrders(data);
-      }
+     }
     } catch (error) {
-      setMessage('Ошибка при загрузке заказов');
+     setMessage('Ошибка при загрузке заказов');
     } finally {
-      setLoading(false);
+     setLoading(false);
     }
-  };
+};
 
-  const handleDateRangeSubmit = () => {
+const handleDateRangeSubmit = () => {
     if (startDate && endDate) {
-      getOrdersData();
+     getOrdersData();
     } else {
-      setMessage('Пожалуйста, выберите обе даты');
+     setMessage('Пожалуйста, выберите обе даты');
     }
-  };
+};
 
-  const formatDate = (dateString) => {
+const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+     day: '2-digit',
+     month: '2-digit',
+     year: 'numeric'
     });
-  };
+};
 
-  const formatPrice = (price) => {
+const formatPrice = (price) => {
     return new Intl.NumberFormat('ru-RU', {
-      style: 'currency',
-      currency: 'RUB'
+     style: 'currency',
+     currency: 'RUB'
     }).format(price);
-  };
+};
 
-  const handleChangePage = (event, newPage) => {
+const handleChangePage = (event, newPage) => {
     setPage(newPage);
-  };
+};
 
-  const handleChangeRowsPerPage = (event) => {
+const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
+};
 
-  return (
+return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Paper sx={{ p: 2 }}>
+     <Paper sx={{ p: 2 }}>
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h5" component="h2" sx={{ color: 'primary.main', mb: 2 }}>
+         <Typography variant="h5" component="h2" sx={{ color: 'primary.main', mb: 2 }}>
             Заказы
-          </Typography>
-          
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
+         </Typography>
+        
+         <Box sx={{
+            display: 'flex',
+            gap: 2,
             flexWrap: 'wrap',
             alignItems: 'center',
             mb: 2
-          }}>
+         }}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
-              <DatePicker
+             <DatePicker
                 label="Дата начала"
                 value={startDate}
                 onChange={(newValue) => setStartDate(newValue)}
-                slotProps={{ 
-                  textField: { 
+                slotProps={{
+                 textField: {
                     size: 'small',
                     sx: { width: 200 }
-                  } 
+                 }
                 }}
                 format="dd.MM.yyyy"
-              />
-              <DatePicker
+             />
+             <DatePicker
                 label="Дата окончания"
                 value={endDate}
                 onChange={(newValue) => setEndDate(newValue)}
-                slotProps={{ 
-                  textField: { 
+                slotProps={{
+                 textField: {
                     size: 'small',
                     sx: { width: 200 }
-                  } 
+                 }
                 }}
                 format="dd.MM.yyyy"
-              />
+             />
             </LocalizationProvider>
             <Button
-              variant="contained"
-              startIcon={<FilterIcon />}
-              onClick={handleDateRangeSubmit}
-              disabled={!startDate || !endDate}
+             variant="contained"
+             startIcon={<FilterIcon />}
+             onClick={handleDateRangeSubmit}
+             disabled={!startDate || !endDate}
             >
-              Применить фильтр
+             Применить фильтр
             </Button>
 
             <TextField
-              size="small"
-              variant="outlined"
-              placeholder="Поиск..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
+             size="small"
+             variant="outlined"
+             placeholder="Поиск..."
+             value={searchTerm}
+             onChange={(e) => setSearchTerm(e.target.value)}
+             InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
+                 <InputAdornment position="start">
                     <SearchIcon />
-                  </InputAdornment>
+                 </InputAdornment>
                 ),
-              }}
-              sx={{ width: 300, ml: 'auto' }}
+             }}
+             sx={{ width: 300, ml: 'auto' }}
             />
-          </Box>
+         </Box>
         </Box>
 
         <TableContainer>
-          <Table size="small">
+         <Table size="small">
             <TableHead>
-              <TableRow>
+             <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell>Номер заказа</TableCell>
                 <TableCell>Дата</TableCell>
@@ -187,75 +203,79 @@ const Orders = () => {
                 <TableCell>Наименование клиента</TableCell>
                 <TableCell align="right">Сумма заказа</TableCell>
                 <TableCell>Водитель</TableCell>
+                <TableCell>Статус</TableCell>
                 <TableCell align="right">Действия</TableCell>
-              </TableRow>
+             </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOrders
+             {filteredOrders
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>{order.id}</TableCell>
-                    <TableCell>{order.number}</TableCell>
-                    <TableCell>{formatDate(order.date)}</TableCell>
-                    <TableCell>{order.clientCode}</TableCell>
-                    <TableCell>{order.clientName}</TableCell>
-                    <TableCell align="right">{formatPrice(order.amount)}</TableCell>
+                 <TableRow key={order.ID}>
+                    <TableCell>{order.ID}</TableCell>
+                    <TableCell>{order.order_uid}</TableCell>
+                    <TableCell>{formatDate(order.order_date)}</TableCell>
+                    <TableCell>{order.brieforg}</TableCell>
+                    <TableCell>{order.client_name}</TableCell>
+                    <TableCell align="right">{formatPrice(order.order_sum)}</TableCell>
                     <TableCell>{order.driver}</TableCell>
-                    <TableCell align="right">
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => {/* Обработка редактирования */}}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => {/* Обработка удаления */}}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
+                    <TableCell align="center">
+                     <OrderStatusIcon status={order.status} />
                     </TableCell>
-                  </TableRow>
+                    <TableCell align="right">
+                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                        <IconButton
+                         size="small"
+                         color="primary"
+                         onClick={() => {/* Обработка редактирования */}}
+                        >
+                         <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                         size="small"
+                         color="error"
+                         onClick={() => {/* Обработка удаления */}}
+                        >
+                         <DeleteIcon fontSize="small" />
+                        </IconButton>
+                     </Box>
+                    </TableCell>
+                 </TableRow>
                 ))}
-              {filteredOrders.length === 0 && (
+             {filteredOrders.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
+                 <TableCell colSpan={9} align="center">
                     {loading ? 'Загрузка...' : 'Заказы не найдены'}
-                  </TableCell>
+                 </TableCell>
                 </TableRow>
-              )}
+             )}
             </TableBody>
-          </Table>
+         </Table>
         </TableContainer>
         
         <TablePagination
-          component="div"
-          count={filteredOrders.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Строк на странице:"
-          labelDisplayedRows={({ from, to, count }) =>
+         component="div"
+         count={filteredOrders.length}
+         page={page}
+         onPageChange={handleChangePage}
+         rowsPerPage={rowsPerPage}
+         onRowsPerPageChange={handleChangeRowsPerPage}
+         labelRowsPerPage="Строк на странице:"
+         labelDisplayedRows={({ from, to, count }) =>
             `${from}-${to} из ${count !== -1 ? count : `более чем ${to}`}`
-          }
-          rowsPerPageOptions={[10, 25, 50, 100]}
+         }
+         rowsPerPageOptions={[10, 25, 50, 100]}
         />
-      </Paper>
+     </Paper>
 
-      <Snackbar
+     <Snackbar
         open={!!message}
         autoHideDuration={6000}
         onClose={() => setMessage('')}
         message={message}
-      />
+     />
     </Container>
-  );
+);
 };
 
 export default Orders;
