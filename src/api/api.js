@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8090/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://172.16.1.170:8090/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -164,6 +164,9 @@ export const blockUser = async (userId, blocked) => {
     const response = await api.post(`/user/${userId}/block`, { blocked }, {
       withCredentials: true  // Убедимся, что куки отправляются
     });
+
+    console.log(response)
+
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Ошибка при изменении статуса блокировки');

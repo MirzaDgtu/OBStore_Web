@@ -30,7 +30,9 @@ import {
   FiberManualRecord as OnlineIcon,
   PhotoCamera,
 } from '@mui/icons-material';
+import blockUser from '../api/api.js';
 import api from '../api/api.js';
+
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
@@ -118,7 +120,7 @@ const Employees = () => {
     if (!formData.email) errors.email = 'Email обязателен';
     if (!formData.firstname) errors.firstname = 'Имя обязательно';
     if (!formData.phone) errors.phone = 'Телефон обязателен';
-    if (!formData.inn) errors.inn = 'ИНН обязателен';
+   // if (!formData.inn) errors.inn = 'ИНН обязателен';
     return Object.keys(errors).length === 0;
   };
 
@@ -159,7 +161,7 @@ const Employees = () => {
 
   const handleBlockToggle = async (employee) => {
     try {
-      await api.blockUser(employee.ID, !employee.blocked);
+      await blockUser(employee.ID, !employee.blocked);
       setMessage(employee.blocked ? 'Сотрудник разблокирован' : 'Сотрудник заблокирован');
       fetchEmployees(); // обновляем список после изменения
     } catch (error) {

@@ -214,7 +214,7 @@ return (
                  <TableRow key={order.ID}>
                     <TableCell>{order.ID}</TableCell>
                     <TableCell>{order.order_uid}</TableCell>
-                    <TableCell>{formatDate(order.order_date)}</TableCell>
+                    <TableCell>{order.order_date}</TableCell>
                     <TableCell>{order.brieforg}</TableCell>
                     <TableCell>{order.client_name}</TableCell>
                     <TableCell align="right">{formatPrice(order.order_sum)}</TableCell>
