@@ -71,7 +71,7 @@ useEffect(() => {
     setPage(0);
 }, [searchTerm, orders]);
 
-const getOrdersData = async () => {
+const getOrdersDataByDateRange = async () => {
     try {
      setLoading(true);
      if (startDate && endDate) {
@@ -90,6 +90,20 @@ const getOrdersData = async () => {
     } finally {
      setLoading(false);
     }
+};
+
+const getOrdersData = async () => {
+   try {
+       setLoading(true);   
+       const data = await getOrders();
+       setOrders(data);
+       setFilteredOrders(data);
+    
+   } catch (error) {
+    setMessage('Ошибка при загрузке заказов');
+   } finally {
+    setLoading(false);
+   }
 };
 
 const handleDateRangeSubmit = () => {

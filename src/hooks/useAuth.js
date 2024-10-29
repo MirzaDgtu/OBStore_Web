@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const useAuth = () => {
+  const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -16,24 +16,17 @@ export const useAuth = () => {
     const userData = localStorage.getItem('User');
     
     if (token && userData) {
+      const user = JSON.parse(userData);
+      setCurrentUser(user);
       setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
     } else {
+      setCurrentUser(null);
       setIsAuthenticated(false);
-      setUser(null);
     }
     setLoading(false);
   };
 
-  const logout = () => {
-    localStorage.removeItem('Auth');
-    localStorage.removeItem('User');
-    setIsAuthenticated(false);
-    setUser(null);
-    navigate('/login');
-  };
-
-  return { isAuthenticated, user, loading, logout, checkAuth };
+  return { currentUser, isAuthenticated, loading };
 };
 
 export default useAuth;

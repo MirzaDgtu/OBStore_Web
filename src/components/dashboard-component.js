@@ -9,6 +9,7 @@ import Profile from '../dashboard/user-profile';
 import Employees from '../dashboard/employees-component';
 import Orders from '../dashboard/orders-component';
 import Reports from '../dashboard/reports-component';
+import AssemblyOrders from '../dashboard/assembly-orders.js';
 
 const StatsDisplay = ({ warehouseStats, pickerStats }) => (
   <Grid2 container spacing={3}>
@@ -59,7 +60,7 @@ const Dashboard = () => {
 
   const navItems = [
     { label: 'ЗАКАЗЫ', path: '/dashboard/orders' },
-    { label: 'СОБРАННЫЕ ЗАКАЗЫ', path: '/dashboard/completed-orders' },
+    { label: 'СОБРАННЫЕ ЗАКАЗЫ', path: '/dashboard/assemblyorders' },
     { label: 'ОТЧЕТЫ', path: '/dashboard/reports' },
     { label: 'СОТРУДНИКИ', path: '/dashboard/employees' },
   ];
@@ -203,7 +204,7 @@ const Dashboard = () => {
             <Route path="/dashboard" element={<StatsDisplay warehouseStats={warehouseStats} pickerStats={pickerStats} />} />
             <Route path="/dashboard/profile" element={<Profile />} />
             <Route path="/dashboard/orders" element={<Orders />} />
-            <Route path="/dashboard/completed-orders" element={<div>Страница собранных заказов</div>} />
+            <Route path="/dashboard/assemblyorders" element={<AssemblyOrders/>} />
             <Route path="/dashboard/reports" element={<Reports />} />
             <Route path="/dashboard/employees" element={<Employees/>} />
           </Routes>

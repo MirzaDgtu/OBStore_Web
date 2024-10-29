@@ -5,9 +5,10 @@ import LoginForm from './components/login-form';
 import Dashboard from './components/dashboard-component';
 import Profile from './dashboard/user-profile';
 import Orders from './dashboard/orders-component';
-//import CompletedOrders from './components/CompletedOrders';
-//import Reports from './components/Reports';
+import AssemblyOrders from './dashboard/assembly-orders';
+import Reports from './dashboard/reports-component';
 import Employees from './dashboard/employees-component';
+
 
 const theme = createTheme({
   // Здесь вы можете настроить тему вашего приложения
@@ -15,7 +16,7 @@ const theme = createTheme({
 
 const navItems = [
     { label: 'Заказы', path: '/dashboard/orders' },
-    { label: 'Собранные заказы', path: '/dashboard/completed-orders' },
+    { label: 'Собранные заказы', path: '/dashboard/assemlyorders' },
     { label: 'Отчеты', path: '/dashboard/reports' },
     { label: 'Сотрудники', path: '/dashboard/employees' },
     { label: 'Профиль', path: '/dashboard/profile' },
@@ -47,10 +48,10 @@ const App = () => {
               {/* Здесь будут остальные маршруты */}
               
               <Route path="orders" element={<Orders />} />
-              {/*<Route path="completed-orders" element={<CompletedOrders />} />
-              <Route path="reports" element={<Reports />} />*/
-              <Route path="employees" element={<Employees />} />
-              }
+              <Route path="assemlyorders" element={<AssemblyOrders />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="employees" element={<Employees />} />  
+
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

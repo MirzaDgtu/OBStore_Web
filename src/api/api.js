@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://172.16.1.170:8090/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8090/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -15,9 +15,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('Auth');
-    if (token) {
-      // Можем оставить и заголовок Authorization для двойной поддержки
-     // config.headers['Authorization'] = `Bearer ${token}`;
+    if (token) {     
+      config.headers['Authorization'] = `Bearer ${token}`;
       // Добавляем куку
       document.cookie = `Auth=${token}; path=/`;
     }
@@ -87,7 +86,7 @@ export const updateUserProfile = async (userData) => {
   }
 };
 
-export const getOrders = async (startDate, endDate) => {
+export const getOrdersByDateRange = async (startDate, endDate) => {
   try {
     let url = '/orders';
     if (startDate && endDate) {
@@ -100,6 +99,38 @@ export const getOrders = async (startDate, endDate) => {
   }
 };
 
+export const getOrders = async () => {
+  try {
+    let url = '/orders';    
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка загрузки заказов');
+  }
+};
+
+export const getAssemblyOrders = async (startDate, endDate) => {
+  try {
+    let url = '/assembly-orders';
+    if (startDate && endDate) {
+      url = `/assembly-orders?startDate=${startDate}&endDate=${endDate}`;
+    }
+    const response = await api.get(url, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка загрузки собранных заказов');
+  }
+};
+
+export const getOrderDetails = async (orderId) => {
+  try {
+    const response = await api.get(`/order/find/id/?id=${orderId}`,
+                                 { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Ошибка загрузки деталей заказа');
+  }
+};
 
 export const updateOrder = async (id, data) => {
   try {
